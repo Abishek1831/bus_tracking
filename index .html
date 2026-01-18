@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REC Transport - Live Bus Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+        <div class="top-content">
+            <div class="college-info">
+                <img src="https://www.rectransport.com/image/peaking.png" alt="REC Logo" class="logo-img">
+                <div class="college-name">
+                    <h3>Rajalakshmi Engineering College</h3>
+                    <p>Transport Management - Thandalam, Chennai</p>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn btn-icon" onclick="toggleTheme()" title="Toggle Dark Mode">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button class="btn btn-icon" onclick="shareCurrentBus()" title="Share Location">📤</button>
+                <button class="btn btn-secondary" onclick="window.open('https://www.rectransport.com', '_blank')">🌐 Website</button>
+                <button class="btn btn-primary" onclick="showHelpline()">📞 Helpline</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Main Header -->
+        <div class="header">
+            <div class="header-top">
+                <div class="header-left">
+                    <div class="bus-icon">🚌</div>
+                    <div class="header-title">
+                        <h1>Live Bus Tracking</h1>
+                        <p>Real-time GPS tracking for REC buses</p>
+                    </div>
+                </div>
+                <div class="time-display">
+                    <div class="time" id="time">Loading...</div>
+                    <div class="date" id="date">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-icon">🚌</div>
+                    <div class="stat-value" id="activeBusCount">0</div>
+                    <div class="stat-label">Active Buses</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📏</div>
+                    <div class="stat-value" id="avgDistanceC">0 km</div>
+                    <div class="stat-label">Avg Distance</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-value" id="avgSpeed">0</div>
+                    <div class="stat-label">Avg Speed (km/h)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="search-section">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="Search by route number or location..." 
+                       onkeyup="filterRoutes()">
+                <button class="clear-btn" id="clearBtn" onclick="clearSearch()">✕</button>
+            </div>
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterStatus('all', event)">All Routes</button>
+                <button class="filter-btn" onclick="filterStatus('active', event)">🟢 Active</button>
+                <button class="filter-btn" onclick="filterStatus('offline', event)">⚫ Offline</button>
+                <button class="filter-btn" onclick="showFavorites()">⭐ Favorites</button>
+                <span id="firebaseStatus" class="firebase-status connecting">
+                    🔄 Connecting...
+                </span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <!-- Sidebar with Routes -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <span>Available Routes</span>
+                    <span class="route-count" id="routeCount">0 Routes</span>
+                </div>
+                <div class="routes-list" id="routesList"></div>
+            </div>
+
+            <!-- Details Panel -->
+            <div class="details" id="detailsContainer">
+                <div class="welcome-message">
+                    <div class="welcome-icon">🚌</div>
+                    <h2>Welcome to REC Live Bus Tracking</h2>
+                    <p>Select a route from the sidebar to view real-time tracking</p>
+                    <div class="welcome-features">
+                        <div class="feature-item">📍 Live GPS Tracking</div>
+                        <div class="feature-item">🗺️ Real-time Route Progress</div>
+                        <div class="feature-item">⏱️ Accurate ETA</div>
+                        <div class="feature-item">🔔 Smart Notifications</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📤 Share Bus Location</h3>
+                <button class="close-btn" onclick="closeShareModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p id="shareText">Loading...</p>
+                <button class="btn btn-primary" onclick="copyShareLink()">📋 Copy Link</button>
+                <button class="btn btn-secondary" onclick="whatsappShare()">📱 WhatsApp</button>
+            </div>
+        </div>
+    </div>
+    <div id="loadingOverlay" style="display:none"></div>
+<div id="notificationBanner" style="display:none"></div>
+<div id="quickStats" style="display:none"></div>
+
+
+     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
